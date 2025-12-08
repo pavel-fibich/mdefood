@@ -6,7 +6,7 @@ ran <- TRUE  # do we run null models?
 
 # List of Food Webs
 fwlist <- c("Plowmanetal", "Krkonose", "CameroonW", "CameroonD")  # names
-fwlen <- c (9, 4, 4, 4)  # gradient lengths
+fwlen <- c (4, 4, 4, 4)  # gradient lengths
 
 ###################################
 # Code specific to each dataset----
@@ -16,6 +16,13 @@ fwlen <- c (9, 4, 4, 4)  # gradient lengths
   wmt$species_lo <- wmt$Species
   wmt$species_hi <- ifelse(wmt$Species.code == "UNC", "UNOCCUPIED", wmt$Species.code)
   wmt$elevation <- wmt$Elevation
+  wmt$elevation<-as.factor(wmt$elevation)
+  wmt$elevation<-as.numeric(wmt$elevation)
+  wmt$elevation<-ifelse (wmt$elevation %in% 1:2, 1, 
+                         ifelse (wmt$elevation %in% 3:4, 2,
+                                 ifelse (wmt$elevation %in% 5:6,3,4)))
+  table(wmt$elevation)
+  
   wmt <- wmt[, ncol(wmt) - c(0, 1, 2)]
   wmt <- wmt[wmt$species_hi != "UNOCCUPIED", ]
   onfw <- "Plowmanetal"

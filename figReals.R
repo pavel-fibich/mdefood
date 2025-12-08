@@ -6,6 +6,7 @@ library(ggplot2)
 library(readr)
 library(ggh4x)
 library(glue)
+library(tidyverse)
 # Data setup ----
 fwlist <- c("Plowmanetal", "Krkonose", "CameroonW", "CameroonD")
 fwlist2 <- c("Myrmecophytic\nant-plant dataset",
@@ -31,7 +32,7 @@ names(elevations_list) <- fwlist2
 # Read in datasets----
 datasets <- 
   fwlist %>% 
-  map(~ read_csv(paste0("realdatasets/netsgrad1000noi_", ., "x1.csv")))
+  map(~ read_csv(paste0("realfood/netsgrad1000noi_", ., "x1.csv")))
 # Set names
 names(datasets) <- fwlist2
 
@@ -182,3 +183,100 @@ plot1
 
 
 ggsave(filename = paste0("realfw2_EL", ".pdf"), plot = plot1, device = NULL, width = 12, height = 10.69, dpi = 300)
+
+
+fwlist<-c("Plowmanetal","Krkonose","CameroonW","CameroonD")
+fwlist2<-c("Mount Wilhelm","Krkonose","Mount Cameroon Wet","Mount Cameroon Dry")
+fwlist2 <- c("Myrmecophytic\nant-plant dataset",
+             "Temperate\nplant-pollinator dataset",
+             "Tropical wet-season\nplant-pollinator dataset",
+             "Tropical dry-season\nplant-pollinator dataset")
+
+fwlen<-c(4,4,4,4)
+dohist<-TRUE
+pdf(paste0("noi_allfws6",ifelse(dohist,"_hist",""),"2_EL.pdf"),width=11,height=12)
+#par(mfrow=c(8,5))
+nf <- layout( matrix(c(1:40), nrow=8,ncol=5, byrow=TRUE),width=c(1,3,3,3,3),
+              heights=c(1,rep(3,6),1))
+wcols<-c("black",rainbow(8))
+#names(wnetsdall)
+i=1;fi=1
+#wnetsdall$nestedness<-wnetsdall$nestedness/max(wnetsdall$nestedness,na.rm=T)
+#wnetsdall$generality.HL<-wnetsdall$generality.HL/max(wnetsdall$generality.HL,na.rm=T)
+#wnetsdall$vulnerability.LL<-wnetsdall$vulnerability.LL/max(wnetsdall$vulnerability.LL,na.rm=T)
+#wnetsdall$NOconnections<-wnetsdall$NOconnections/max(wnetsdall$NOconnections,na.rm=T)
+#8
+par(mar=c(2,4,2,0.5))
+plot(1:10,typ="n",bty='n',axes=F,xlab="",ylab="")
+for (fi in 1:length(fwlist) ) {
+  plot(1:10,typ="n",bty='n',axes=F,xlab="",ylab="")
+  (onfw=fwlist[fi])
+  mtext(fwlist2[grep(onfw,fwlist)],3,-2,cex=1.1)
+}
+#names(wnetsdall)[1:8]<-c("Total realized links","Connectance","nest","Nestedness",
+#                    "Specialization asymmetry", "H2", "Generality","Vulnerability")
+for (i in c(1:2,4,6:8) ){
+  plot(1:10,typ="n",bty='n',axes=F,xlab="",ylab="")
+  names(wnetsdall)[1:8]<-c("Total realized links","Connectance","nest","Nestedness",
+                           "Specialization asymmetry", "H2", "Generality","Vulnerability")
+  mtext(names(wnetsdall)[i],2,0,cex=1.2)
+  for (fi in 1:length(fwlist) ) {
+    wnetsdall<-read.csv(paste0("realfood/netsgrad1000noi_",fwlist[fi],"x1.csv"))
+    
+    mygr<-fwlen[fi]
+    grale<-mygr
+    (onfw=fwlist[fi])
+    
+    ane<-aggregate(as.formula(paste0(names(wnetsdall)[i],"~gr")),FUN=mean,data=wnetsdall[wnetsdall$null !=0,],na.rm=T )
+    anesd<-aggregate(as.formula(paste0(names(wnetsdall)[i],"~gr")),FUN=sd,data=wnetsdall[wnetsdall$null !=0,],na.rm=T )
+    anel<-aggregate(as.formula(paste0(names(wnetsdall)[i],"~gr")),FUN=quantile,data=wnetsdall[wnetsdall$null !=0,],na.rm=T,probs=c(0.025) )
+    aneh<-aggregate(as.formula(paste0(names(wnetsdall)[i],"~gr")),FUN=quantile,data=wnetsdall[wnetsdall$null !=0,],na.rm=T,probs=c(0.975) )
+    ane0<-wnetsdall[wnetsdall$null ==0,]
+    #random ses
+    rasum<-c()
+    for (oneg in unique(wnetsdall[wnetsdall$null>0,]$null) ) {
+      anex<-wnetsdall[wnetsdall$null == oneg,]
+      rasum <- c(rasum, sum( abs( ane[,2] - anex[,i] )/abs(anesd[,2]) )   )
+    }
+    
+    (rasumq<-quantile(rasum,probs=c(0.025,0.95), na.rm=T))
+    # get sum of SES
+    (obssum <- sum( abs( ane[,2] - ane0[,i])/abs(anesd[,2]) ))
+    
+    if (! dohist) {
+      plot( y=seq(min(wnetsdall[,i],na.rm=T), max(wnetsdall[,i],na.rm=T),length=grale ),
+            x=1:grale,col="white",ylab=ifelse(fi==12,names(wnetsdall)[i],""),xlab="",xaxt='n',
+            main=ifelse(i==12,fwlist2[grep(onfw,fwlist)],"") )
+      axis(1, sort(unique(wnetsdall$gr)))
+      lines(x=ane$gr,y=ane[,2],col=wcols[i],lwd=1,lty=3)
+      lines(x=anel$gr,y=anel[,2],col=wcols[i],lwd=1)
+      lines(x=aneh$gr,y=aneh[,2],col=wcols[i],lwd=1)
+      lines(x=ane0$gr,y=ane0[,i],col=wcols[i],lwd=3,lty=2)
+      points(x=ane0$gr,y=ane0[,i],col=wcols[i],lwd=2,lty=2,
+             cex= ifelse( (ane0[,i]<anel[,2]) | (ane0[,i]>aneh[,2]),3,1 ),
+             pch=ifelse( (ane0[,i]<anel[,2]) | (ane0[,i]>aneh[,2]),1,2 ))
+    } else {
+      #if( any((ane0[,i]<anel[,2]) | (ane0[,i]>aneh[,2])) ) mtext("*",side=3,line=-2,adj=1,cex=3,col=wcols[i])
+      #if ((i==1)& (fi==1))
+      #  legend("topright",lty=c(2,1,3),lwd=c(3,1,1),legend=c("observed","95% conf ints","mean conf ints"))
+      
+      hist(rasum,main="",xlab="")
+      abline(v=obssum,col="red",lwd=2)
+      abline(v=rasumq,col="gray",lwd=2)
+      mtext(paste0( "Observed sum=",round(obssum,3)),3,1,col="red",adj=0)
+    }
+    
+    if( any( (obssum < rasumq[1]) | (obssum > rasumq[2])  ) ) mtext("*",side=3,line=-2,adj=1,cex=3,col="red")
+  }
+  #if ((i==1)& (fi==2))
+  #  legend("bottomleft",legend=row.names(wnetsd),col=wcols,lty=1,bg =NA)
+}
+plot(1:10,typ="n",bty='n',axes=F,xlab="",ylab="")
+for (fi in 1:length(fwlist) ) {
+  plot(1:10,typ="n",bty='n',axes=F,xlab="",ylab="")
+  (onfw=fwlist[fi])
+  #mtext("elevation",3,0,cex=1.1)
+}
+
+dev.off()
+

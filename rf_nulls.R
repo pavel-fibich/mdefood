@@ -10,7 +10,8 @@
 # head(wmt)
 
 
-{wnets0<-c(rep(NA,8))
+{
+  wnets0<-c(rep(NA,8))
 names(wnets0)<-c("NOconnections","connectance","nestedness","NODF","SA","H2","generality.HL","vulnerability.LL")
 
 if ( !ran ){
@@ -50,7 +51,7 @@ wnetsdall<-NULL
 myran=1
 
 # load(".RData")
-for (myran in 0:20){ # random shifting
+for (myran in 0:500){ # random shifting
   print(paste(".................",myran))
   (maxra<-max(as.numeric(hlra$to),na.rm=T))
   (minra<-min(as.numeric(hlra$from),na.rm=T))
@@ -101,8 +102,9 @@ for (myran in 0:20){ # random shifting
     
     (allgr<-sort(unique(c( hlra$from,hlra$to) )))
     for(alg in allgr) hlra[paste0("gr",alg)]<-FALSE
-    for(algi in 1:nrow(hlra)) 
+    for(algi in 1:nrow(hlra)) {
       hlra[algi,paste0("gr",allgr)] <- allgr %in% seq(hlra[algi,]$from,hlra[algi,]$to)
+    }
     hlraA<-hlra
     
     #plow
@@ -205,6 +207,6 @@ for (myran in 0:20){ # random shifting
     wnetsdall<-rbind(wnetsdall,wnetsdallx)
   }
 }
-write.csv(wnetsdall,paste0("realfood/netsgrad1000noi_",onfw,"x2.csv"),row.names=F)
+write.csv(wnetsdall,paste0("realfood/netsgrad1000noi_",onfw,"x1.csv"),row.names=F)
 #write.csv(wnetsdall,"netsgrad1000noi_krko.csv",row.names=F)
 }
