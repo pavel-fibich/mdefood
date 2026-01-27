@@ -49,7 +49,9 @@ datasets <-
   pivot_longer(NOconnections:vulnerability.LL,
                names_to = "index",
                values_to = "index_value") %>% 
-  mutate(index = case_when(index == "NOconnections" ~ "Total~realised~links",
+  mutate(index = case_when(index == "number.of.species.LL" ~ "Species~richness~LO",
+                           index == "number.of.species.HL" ~ "Species~richness~HI",
+                            index == "NOconnections" ~ "Total~realised~links",
                            #index == "SA" ~ "Specialisation~asymmetry",
                            index == "generality.HL" ~ "Generality",
                            index == "vulnerability.LL" ~ "Vulnerability",
@@ -60,7 +62,8 @@ datasets <-
                            .default = index)) %>% 
   mutate(index = factor(index, 
                         levels = 
-                          c("Total~realised~links",
+                          c("Species~richness~LO","Species~richness~HI",
+                            "Total~realised~links",
                             "Connectance",
                             "Nestedness",
                             #"NODF",
@@ -69,7 +72,8 @@ datasets <-
                             "Generality",
                             "Vulnerability"),
                         labels = 
-                          c("Total~realised~links",
+                          c("Species~richness~LO","Species~richness~HI",
+                            "Total~realised~links",
                             "Connectance",
                             "Nestedness",
                             #                          "NODF",
@@ -170,7 +174,7 @@ plot1 <-
   theme_classic(base_size = 15) +
   theme(
     plot.margin = unit(c(0, 1, 1, 0), "lines"),  # Widens the right margin
-    legend.position = "none",
+    legend.position = "bottom",
     strip.placement = "outside",
     strip.switch.pad.grid = unit(0, "cm"),
     strip.background = element_blank(), 
@@ -179,6 +183,8 @@ plot1 <-
     # panel.spacing.y = unit(0.5, "cm")
   ) +
   labs(x = "Elevation (m a.s.l.)", y = "")
+plot1<-plot1+scale_shape(name="Within null model",labels=c("Yes","No (     for whole gradient)"))+
+  guides(fill="none")+guides(colour="none")
 plot1
 
 

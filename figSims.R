@@ -71,7 +71,7 @@ for (polyn in c(2,4))
       rename("dist" = "gr",
              "Species richness LO" = "LOints",
              "Species richness HI" = "HIints",
-             "Total realised links" = "allInts",
+             "Total realized links" = "allInts",
              #         "Specialisation asym." = "spec_asym",
              "nestedness" = "NODF")
     
@@ -107,9 +107,10 @@ for (polyn in c(2,4))
       filter(grstep == 10) %>% 
       filter(dist %in% seq(10,100,10)) %>% 
       # summarise(across("Total realised links":vulnerability, mean)) %>%
-      mutate(Connections = `Total realised links`) %>% 
-      pivot_longer(`Total realised links`:vulnerability, names_to = "index") %>% 
-      filter(index %in% c("Species richness LO", "Species richness HI","Total realised links", 
+      mutate(Connections = `Total realized links`) %>% 
+      pivot_longer(`Total realized links`:vulnerability, names_to = "index") %>% 
+      filter(index %in% c("Species richness LO", "Species richness HI",
+                          "Total realized links", 
                           "connectance",
                           "nestedness",
                           "NODF",
@@ -120,7 +121,7 @@ for (polyn in c(2,4))
       mutate(index = factor(index,
                             levels = 
                               c("Species richness LO","Species richness HI",
-                                "Total realised links", 
+                                "Total realized links", 
                                 "connectance",
                                 "nestedness",
                                 "NODF",
@@ -130,7 +131,7 @@ for (polyn in c(2,4))
                                 "vulnerability"),
                             labels = 
                               c("Species~richness~LO","Species~richness~HI",
-                                "Total~realised~links",
+                                "Total~realized~links",
                                 "Connectance",
                                 "Nestedness",
                                 "NODF",

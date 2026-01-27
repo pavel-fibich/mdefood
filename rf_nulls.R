@@ -11,8 +11,9 @@
 
 
 {
-  wnets0<-c(rep(NA,8))
-names(wnets0)<-c("NOconnections","connectance","nestedness","NODF","SA","H2","generality.HL","vulnerability.LL")
+  wnets0<-c(rep(NA,10))
+names(wnets0)<-c("NOconnections","connectance","nestedness","NODF","SA","H2",
+                 "number.of.species.HL","number.of.species.LL","generality.HL","vulnerability.LL")
 
 if ( !ran ){
   pdf(paste0(onfw,"rangesx.pdf"),10,5)
@@ -180,14 +181,14 @@ for (myran in 0:500){ # random shifting
         if ( (nrow(hilo) >= 2) & (ncol(hilo) >= 2) ) {
           ( wnets <- networklevel(hilo,index=
                                     c("H2","generality","vulnerability","connectance","nestedness",
-                                      "nestedness","NODF","SA")
+                                      "nestedness","NODF","SA","number of species")
           ) )
           wnetsd<-cbind(wnetsd, c(sum(hilo>0,na.rm=T),wnets) )
         } else {
-          wnetsd<-cbind(wnetsd, c(0,rep(NA,7)) )
+          wnetsd<-cbind(wnetsd, c(0,rep(NA,9)) )
         }
       } else {
-        wnetsd<-cbind(wnetsd, c(0,rep(NA,7)) )
+        wnetsd<-cbind(wnetsd, c(0,rep(NA,9)) )
       }
       
     }
